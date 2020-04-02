@@ -11,13 +11,13 @@ FDISK=/dev/fd0
 AS=as -32
 CC=gcc
 
-CFLAGS= -Wall -march=i486 -m32 -O1 -fomit-frame-pointer -fno-builtin \
+CFLAGS= -Wall -march=i486 -m32 -O0 -fomit-frame-pointer -fno-builtin \
 	-ffreestanding -fPIC $(SMP_FL) -fno-stack-protector
 
 OBJS= head.o reloc.o main.o test.o init.o lib.o patn.o screen_buffer.o \
       config.o memsize.o error.o smp.o cpuid.o vmem.o random.o
 
-all: clean memtest.bin memtest
+all: clean memtest.bin memtest memtest.img
 
 # Link it statically once so I know I don't have undefined
 # symbols and then link it dynamically so I have full
@@ -46,6 +46,10 @@ memtest.bin: memtest_shared.bin bootsect.o setup.o memtest.bin.lds
 	$(LD) -T memtest.bin.lds bootsect.o setup.o -b binary \
 	memtest_shared.bin -o memtest.bin
 
+memtest.img: memtest.bin
+	dd status=noxfer conv=notrunc iflag=nocache bs=512 count=2880 if=/dev/zero of=./memtest.img
+	dd status=noxfer conv=notrunc iflag=nocache if=./memtest.bin of=./memtest.img
+
 reloc.o: reloc.c
 	$(CC) -c $(CFLAGS) -fno-strict-aliasing reloc.c
 
@@ -53,11 +57,11 @@ test.o: test.c
 	$(CC) -c -Wall -march=i486 -m32 -O0 -fomit-frame-pointer -fno-builtin -ffreestanding test.c
 
 random.o: random.c
-	$(CC) -c -Wall -march=i486 -m32 -O3 -fomit-frame-pointer -fno-builtin -ffreestanding random.c
+	$(CC) -c -Wall -march=i486 -m32 -O0 -fomit-frame-pointer -fno-builtin -ffreestanding random.c
 
 clean:
 	rm -f *.o *.s *.iso memtest.bin memtest memtest_shared \
-		memtest_shared.bin memtest.iso
+		memtest_shared.bin memtest.iso memtest.img
 
 iso:
 	make all

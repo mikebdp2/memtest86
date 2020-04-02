@@ -11,7 +11,9 @@
 #include "config.h"
 #include "cpuid.h"
 #include "smp.h"
-#include "io.h"
+/* Copy of io.h as a dirty hack to solve the ld linkage problems. */
+#include "io_my.h"
+/* Custom changes to a code below: inb -> my_inb, outb -> my_outb */
 
 extern struct tseq tseq[];
 extern short memsz_mode;
@@ -76,7 +78,7 @@ void init(void)
 {
 	int i;
 
-	outb(0x8, 0x3f2);  /* Kill Floppy Motor */
+	my_outb(0x8, 0x3f2);  /* Kill Floppy Motor */
 
 	/* Turn on cache */
 	set_cache(1);
@@ -857,17 +859,17 @@ static int cpuspeed(void)
 	}
 
 	/* Setup timer */
-	outb((inb(0x61) & ~0x02) | 0x01, 0x61);
-	outb(0xb0, 0x43); 
-	outb(TICKS & 0xff, 0x42);
-	outb(TICKS >> 8, 0x42);
+	my_outb((my_inb(0x61) & ~0x02) | 0x01, 0x61);
+	my_outb(0xb0, 0x43); 
+	my_outb(TICKS & 0xff, 0x42);
+	my_outb(TICKS >> 8, 0x42);
 
 	asm __volatile__ ("rdtsc":"=a" (s_low),"=d" (s_high));
 
 	loops = 0;
 	do {
 		loops++;
-	} while ((inb(0x61) & 0x20) == 0);
+	} while ((my_inb(0x61) & 0x20) == 0);
 
 	asm __volatile__ (
 		"rdtsc\n\t" \
