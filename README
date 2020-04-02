@@ -1,0 +1,11 @@
+Instructions for the MemTest86 floppy disk creation.
+====================================================
+
+1) Insert a floppy disk into the drive.
+3) As root type: dd if=memtest86-<ver>.floppy.img of=<dev> 
+
+where <dev> is the device the floppy drive is assigned to (eg. /dev/fd0 [Linux] or /dev/disk2 [Mac]).
+
+Warning: all data on the floppy disk will be lost. 
+Warning Warning: Make sure that the device used in the dd command above
+is correct!!!

@@ -1,0 +1,1 @@
+Creating a boot-able floppy disk requires use of a third party program to write the floppy disk image to a disk. A number of programs are available to write the disk image. Rawwrite is a recommended free program available at: http://www.chrysocome.net/rawwrite. A more robust solution is WinImage, available at http://www.winimage.com/download.htm.
